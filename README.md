@@ -280,3 +280,60 @@ const LearnDataFetching = async () => {
 
 export default LearnDataFetching;
 ```
+
+# Backend API in Next.js
+
+- Here we need to create a file named "route.js" instead of "page.jsx" for api
+
+- src\app\api\products\route.js
+
+- Here we need to write simple js functions
+
+- URL => http://localhost:3000/api/products
+
+```javascript
+import { NextResponse } from "next/server";
+
+export async function GET(req) {
+  //   console.log(req);
+
+  // const requestHeaders = new Headers(req.headers);
+  // console.log(requestHeaders);
+
+  return NextResponse.json({ msg: "Hello Next.js API" });
+}
+```
+
+# Query Params
+
+- http://localhost:3000/api/products?search=%22java%22
+
+```javascript
+const { searchParams } = new URL(req.url);
+console.log(searchParams);
+```
+
+```javascript
+// const searchParams = req.nextUrl.searchParams.get("search");
+const searchParams = req.nextUrl.searchParams;
+console.log(searchParams);
+```
+
+-output we will get as an object with key as "search" and value as "java"
+
+# Cookies
+
+```javascript
+const cook1 = req.cookies;
+console.log("cookies: ", cook1);
+```
+
+# POST Request
+
+```javascript
+export async function POST(req) {
+  const res = await req.json(); //get body in post request
+  console.log("res:", res);
+  return NextResponse.json({ msg: "Post request successful" }, { status: 201 });
+}
+```
