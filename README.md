@@ -633,3 +633,128 @@ export async function POST(req) {
 - API Endpoint for post will be same => http://localhost:3000/api/posts
 
 - checked it's working with Form and from Postman also
+
+# Other approch without API
+
+- we can directly update to database without api
+
+- - GetData2.jsx
+
+```javascript
+import connectDB from "@/lib/connectDB";
+import PostModel from "@/models/post";
+
+const GetData2 = async () => {
+  await connectDB();
+  const data = await PostModel.find();
+  console.log(data);
+  return (
+    <div>
+      {data.map((item) => {
+        return (
+          <div key={item._id}>
+            <h1>{item.title}</h1>
+            <h4>{item.body}</h4>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+export default GetData2;
+```
+
+- - PostData2.jsx
+
+```javascript
+import connectDB from "@/lib/connectDB";
+import PostModel from "@/models/post";
+
+const PostData2 = () => {
+  const create = async (formData) => {
+    "use server"; // this is important  and remove all client side function and state
+    await connectDB();
+    const res = await PostModel.create({
+      title: formData.get("title"),
+      body: formData.get("body"),
+    });
+    console.log(res);
+  };
+  return (
+    <div className="container">
+      <form action={create} className="container">
+        <label>
+          Title
+          <input type="text" name="title" placeholder="Enter title" />
+        </label>
+        <label>
+          Body
+          <input type="text" name="body" placeholder="Enter body" />
+        </label>
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+  );
+};
+
+export default PostData2;
+```
+
+# Change Title of title bar
+
+- add meta data in main page.js
+
+```javascript
+import GetData from "./components/GetData";
+import GetData2 from "./components/GetData2";
+import PostData1 from "./components/PostData1";
+import PostData2 from "./components/PostData2";
+
+export const metadata = {
+  // This need to add title: " title_name"
+  title: "Blog Post",
+  description: "This is blog post all ",
+};
+
+export default function Home() {
+  return (
+    <div>
+      {/* <GetData /> */}
+      {/* <PostData1 /> */}
+      <PostData2 />
+      <GetData2 />
+    </div>
+  );
+}
+```
+
+# Middleware
+
+Middleware allows you to run code before a request is completed. Then, based on the incoming request, you can modify the response by rewriting, redirecting, modifying the request or response headers, or responding directly.
+
+Middleware runs before cached content and routes are matched.
+
+- need to create inside src forlder " middleware.js" file
+
+```javascript
+import { NextResponse } from "next/server";
+
+// This function can be marked `async` if using `await` inside
+export function middleware(request) {
+  return NextResponse.redirect(new URL("/home", request.url));
+}
+
+// See "Matching Paths"
+export const config = {
+  matcher: "/about/:path*",
+};
+```
+
+# LAZY LOADING
+
+https://nextjs.org/docs/app/building-your-application/routing/loading-ui-and-streaming
+
+# Error Handling
+
+https://nextjs.org/docs/app/building-your-application/routing/error-handling
