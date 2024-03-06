@@ -394,3 +394,142 @@ export const GET = async (req) => {
 - Now we can use our own api end point to fetch and show data on UI end point will be
 - - http://localhost:3000/api/blogs/posts
 - this end point will secure out api key which will be expensive and will be very safe at backend
+
+# MONGO DB CONNECTION
+
+- create env file inside main folder ".env.local"
+
+```javascript
+DATABASE_URL = "mongodb://localhost:27017";
+DBNAME = "newblog";
+DBUSERNAME = "";
+DBPASSWORD = "";
+DBAUTHSOURCE = "";
+```
+
+- Create a new file name could be anything => src\lib\connectDB.js
+
+- install mongoose
+
+```javascript
+ npm i mongoose
+```
+
+- connectDB.js => we will create connection in mongoose
+
+```javascript
+import mongoose from "mongoose";
+
+export default async () => {
+  try {
+    const DB_OPTIONS = {
+      dbName: process.env.DBNAME,
+      user: process.env.DBUSERNAME,
+      pass: process.env.DBPASSWORD,
+      authSource: process.env.DBAUTHSOURCE,
+    };
+    await mongoose.connect(process.env.DATABASE_RUL, DB_OPTIONS);
+    console.log("Connected Successfully...");
+  } catch (error) {
+    console.log(error);
+  }
+};
+```
+
+- create file api\posts\route.js =>
+
+```javascript
+import connectDB from "@/lib/connectDB";
+import { NextResponse } from "next/server";
+
+export async function GET(req) {
+  try {
+    await connectDB();
+    return NextResponse.json({ msg: "success" }, { status: 200 });
+  } catch (error) {
+    return NextResponse.json({ msg: "Something went wrong" }, { status: 400 });
+  }
+}
+```
+
+- Now we need to create schema
+
+- src\models\post.js
+
+```javascript
+import mongoose from "mongoose";
+
+// Defining Schema
+const postSchema = new mongoose.Schema({
+  title: { type: String, required: true, trim: true },
+  body: { type: String, required: true, trim: true },
+});
+
+// Compiling Schema
+
+const Post = mongoose.models.Post || mongoose.model("Post", postSchema);
+
+export default Post;
+```
+
+- import in api\posts\route.js = >
+- - import PostModel from "@/models/post";
+- - After that hit the end point "http://localhost:3000/api/posts"
+
+- we created for get up to here so for checking we have to inseart one data manualy from Mongo DB comapss
+
+- now add inside api\posts\route.js =>
+- - const result = await PostModel.find();
+
+```javascript
+import connectDB from "@/lib/connectDB";
+import { NextResponse } from "next/server";
+import PostModel from "@/models/post";
+
+export async function GET(req) {
+  try {
+    const result = await PostModel.find(); // MongoDB commends
+    await connectDB();
+    return NextResponse.json({ data: result }, { status: 200 });
+  } catch (error) {
+    return NextResponse.json({ msg: "Something went wrong" }, { status: 400 });
+  }
+}
+```
+
+- now hit the url we will get data
+- - http://localhost:3000/api/posts
+
+- to display this data on UI we need to fetch this data in component
+
+```javascript
+const fetchData = async () => {
+  const res = await fetch("http://localhost:3000/api/posts");
+  if (!res.ok) {
+    throw new Error("faild to fetch data");
+  }
+  const data = await res.json();
+  return data.data;
+};
+
+const GetData = async () => {
+  const data = await fetchData();
+  console.log(data);
+  return (
+    <div>
+      {data.map((item) => {
+        return (
+          <div key={item._id}>
+            <h1>{item.title}</h1>
+            <h4>{item.body}</h4>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+export default GetData;
+```
+
+- finally load this component on main route.js file
