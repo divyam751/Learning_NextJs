@@ -338,4 +338,59 @@ export async function POST(req) {
 }
 ```
 
-last update 1:30
+```javascript
+export async function POST(req) {
+  // const res = await req.json(); //get body in post request
+  // console.log("res:", res);
+
+  const formData = await req.formData(); //get body from postman "x-www-form-urlencoded" key and value
+  console.log("formData", formData);
+
+  return NextResponse.json({ msg: "Post request successful" }, { status: 201 });
+}
+```
+
+# Get request with aero function and with dynamic route for sigle item
+
+-http://localhost:3000/api/products/8
+
+```javascript
+const { NextResponse } = require("next/server");
+
+export const GET = async (req, context) => {
+  // we can directly destructe context as  {params}
+  //   console.log("req:", req);
+  //   console.log(context.params.id);
+  console.log(context); // output =>    { params: { id: '8' } }
+  return NextResponse.json(
+    {
+      msg: "GET Request with aero function and dynamic route",
+    },
+    { status: 200 }
+  );
+};
+```
+
+# Use 3rd party API and fetch data on server and provide as own API (security purpose)
+
+- created a new folder
+- blogs\posts\route.js
+
+```javascript
+import { NextResponse } from "next/server";
+
+export const GET = async (req) => {
+  const res = await fetch("https://jsonplaceholder.typicode.com/posts", {
+    headers: {
+      "Content-Type": "aplication/json", //api key or anyother headers
+    },
+  });
+  const post = await res.json();
+
+  return NextResponse.json({ data: post });
+};
+```
+
+- Now we can use our own api end point to fetch and show data on UI end point will be
+- - http://localhost:3000/api/blogs/posts
+- this end point will secure out api key which will be expensive and will be very safe at backend

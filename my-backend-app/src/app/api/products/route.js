@@ -24,7 +24,11 @@ export async function GET(req) {
 }
 
 export async function POST(req) {
-  const res = await req.json();
-  console.log("res:", res);
+  // const res = await req.json();
+  // console.log("res:", res);
+
+  const formData = await req.formData();
+  console.log("formData", formData);
+
   return NextResponse.json({ msg: "Post request successful" }, { status: 201 });
 }
