@@ -87,4 +87,196 @@ const post = ({ params }) => {
 export default post;
 ```
 
-last updated up to 40 min
+# Parallel routes
+
+- we can define with @ symbol
+- @left
+- @right
+- folder structure will be "colorbox\@left\@right
+- layout.js inside colorbox folder , we can use this for condional layout rendering
+
+```javascript
+export default function ColorBoxLayout({ children, left, right }) {
+  const isColor = true;
+  return (
+    <section>
+      {children}
+      {isColor ? left : right}
+      {/* {left}
+      {right} */}
+    </section>
+  );
+}
+```
+
+# Layout.js
+
+- we will use layout.js file to define layout like if we want a AdminHeader in all the admin routes then we have to define a layout.js page inside admin folder and we need to pass children and import AdminHeader component
+
+  - folder will be " admin\dashboard\page.jsx"
+  - folder will be " admin\profile\page.jsx"
+  - folder will be " admin\layout.js"
+  - folder will be " components\AdminHeader.jsx"
+
+```javascript
+import AdminHeader from "@/components/AdminHeader";
+
+export default function AdminLayout({ children }) {
+  return (
+    <section>
+      <AdminHeader />
+      {children}
+    </section>
+  );
+}
+```
+
+# Link tag for navigate to one page to another similar like a anchor tag
+
+- <Link href="/admin/dashboard">Go to Dashboard</Link>
+- inside components LearnLinks.jsx and we need to import it on home page.jsx
+
+```javascript
+import Link from "next/link";
+
+const LearnLinks = () => {
+  const id = 2;
+  return (
+    <div>
+      <Link href="/admin/dashboard">Go to Dashboard</Link>
+      // <Link href={`/users/profiles/${id}`}>Go to Dashboard</Link> // for dynamic
+      routing
+    </div>
+  );
+};
+
+export default LearnLinks;
+```
+
+# useRouter (for navigation)
+
+- This work only in client's pc for that we need to mention "use client" at the top of the page
+
+- import { useRouter } from "next/navigation";
+
+```javascript
+import { useRouter } from "next/navigation";
+const LearnUseRouter = () => {
+  const router = useRouter();
+  console.log("router:", router);
+  return (
+    <>
+      <h1>Use Router </h1>
+      <button type="button" onClick={() => router.push("/admin/dashboard")}>
+        Go to Admin without refresh
+      </button>
+    </>
+  );
+};
+
+export default LearnUseRouter;
+```
+
+- import this component on the main page
+
+# Server and Client components
+
+- By default they all are server components
+- some features we can use only in client side like
+- - useState
+- - any event
+- - useRouter
+
+# When to use Server and Client Components?
+
+- Server Components
+- - Fetch data
+- - Access backend resources (directly)
+- - Keep sensitive information on the server (access tokens, API keys, etc)
+- - Keep large dependencies on the server / Reduce client-side JavaScript
+
+- Client Components
+- - Add interactivity and event listeners (onClick(), onChange(), etc)
+- - Use State and Lifecycle Effects (useState(), useReducer(), useEffect(), etc)
+- - Use browser-only APIs
+- - Use custom hooks that depend on state, effects, or browser-only APIs
+- - Use React Class components
+
+# Global CSS
+
+- Global Css we use directly just need to define in globals.css file inside app folder
+
+# Module CSS
+
+- For module css we have to create a css file with extension name "fileName.module.css" and then we have to import it in component and then we can use it as an object
+
+- it will not effect the global css if have same name of class or id
+
+```javascript
+import styles from "../app/css/ModuleCssComp.module.css";
+const ModuleCssComponent = () => {
+  return (
+    <div className={styles.fontSize_60}>
+      it's Module CSS component for this we have to create a file with extension
+      name "fileName.module.css" then import it in component and use as an
+      object
+    </div>
+  );
+};
+
+export default ModuleCssComponent;
+```
+
+# Images in Next.js
+
+- Images is optimized in Next js
+
+```javascript
+import Image from "next/image";
+import tom from "../../public/images/tom.jpg";
+const LearnImageTag = () => {
+  return (
+    <div>
+      <Image src={tom} width={800} alt="Tom & Jerry" />
+      {/* this Image is optimized from next js */}
+    </div>
+  );
+};
+
+export default LearnImageTag;
+```
+
+# Form in Next.js
+
+- Form is similar to react , if we need to use hooks like useState or useEffect the we just need to use "use client" at the top of the component and form will be same as in react
+
+# Data Fetching in server side
+
+```javascript
+async function getData() {
+  const response = await fetch("https://fakestoreapi.com/products");
+  if (!response.ok) {
+    throw new Error("Failed to fetch data");
+  }
+  return response.json();
+}
+const LearnDataFetching = async () => {
+  const data = await getData();
+  console.log(data);
+  return (
+    <div>
+      {data.map((item) => {
+        return (
+          <div key={item.id}>
+            <h4>{item.title}</h4>
+            <p> {item.description} </p>
+            <hr />
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+export default LearnDataFetching;
+```
